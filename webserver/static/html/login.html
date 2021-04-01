@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录</title>
+</head>
+
+
+<body>
+<form action="./index">
+    用户名:<input type="text" id="uname"/><br>
+    密码:<input type="password" id="pwd"/><br>
+    <input type="submit" value="登录" onclick="return checkUser()"/>
+</form>
+<form action="./reg">
+    <input type="submit" value="注册" onclick="return true"/>
+</form>
+
+
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="/static/js/query.js"></script>
+<script src="/static/js/util.js"></script>
+
+</body>
+
+</html>
