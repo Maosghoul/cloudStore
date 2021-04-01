@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+
+    <title>云盘</title>
+</head>
+
+<body>
+
+<div>
+    <input id="upfile" type="file" multiple="multiple" onchange="inputFile()"
+           style="display: none;position: absolute"/>
+    <button type="button" onclick="upfile.click()">上传文件</button>
+    <button type="button" onclick="return deleteFile()">删除文件</button>
+    <button type="button" onclick="return adultFile()">文件审计</button>
+    <button type="button" onclick="return cancel()">退出登录</button>
+
+</div>
+<div>
+    <table class="table" id="filetable">
+
+    </table>
+
+
+</div>
+
+
+<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+<script src="/static/js/query.js"></script>
+<script src="/static/js/util.js"></script>
+<script>
+    checkLogin()
+    ListFile()
+    innerml = `<thead>
+            <tr>
+                <th>
+                    <input type="checkbox" id="checkAll" value=0 />
+                </th>
+                <th>ID</th>
+                <th>NAME</th>
+                <th>TIME</th>
+            </tr>
+        </thead>`
+    for (var i = 0; i < arr.length; i++) {
+        tmp = '<tbody>'
+        tmp += '<td><input type="checkbox" value=' + (i + 1) + ' /></td>'
+        tmp += '<td>' + (i + 1) + '</td>'
+        tmp += '<td>' + arr[i].name + '</td>'
+        tmp += '<td>' + arr[i].time + '</td>'
+        tmp += '</tbody>'
+        innerml += tmp
+    }
+    $("#filetable").html(innerml)
+
+    $(function () {
+        $('#checkAll').click(function (event) {
+            var tr_checkbox = $('table tbody tr').find('input[type=checkbox]');
+            tr_checkbox.prop('checked', $(this).prop('checked'));
+            len = $('table tbody tr').find('input[type=checkbox]:checked').length
+            len1 = $('table tbody tr').length
+            if (len == len1) {
+                for (var i = 1; i <= arr.length; i++) {
+                    checkBoxIdList[i] = 1
+                }
+            } else {
+                for (var i = 1; i <= arr.length; i++) {
+                    checkBoxIdList[i] = 0
+                }
+            }
+            console.log(checkBoxIdList)
+            event.stopPropagation();
+        });
+
+        $('table tbody tr').find('input[type=checkbox]').click(function (event) {
+            var tbr = $('table tbody tr');
+            $('#checkAll').prop('checked', tbr.find('input[type=checkbox]:checked').length == tbr
+                .length ? true : false);
+            event.stopPropagation();
+        });
+
+        $('table tbody tr').find('input[type=checkbox]').click(function () {
+            var val = $(this).val()
+            console.log("val:", val)
+            if ($(this).is(":checked")) {
+                checkBoxIdList[val] = 1
+            } else {
+                checkBoxIdList[val] = 0
+            }
+            console.log(checkBoxIdList)
+        })
+    });
+</script>
+</body>
+
+</html>
