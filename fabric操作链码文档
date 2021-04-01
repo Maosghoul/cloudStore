@@ -1,0 +1,71 @@
+docker 的配置文件在env后面添加
+- GODEBUG=netdns=go
+
+
+链码的开发环境
+链码存放
+将 chaincode002 复制到 fabric-samples/chaincode
+
+开启3个终端
+终端1-启动网络
+$ cd chaincode-docker-devmode
+
+$ docker-compose -f docker-compose-simple.yaml up    
+docker 启动出错
+
+# 删除所有的 docker 容器
+$ docker rm -f $(docker ps -aq)
+
+
+终端2- 编译且启动链码
+$ docker exec -it chaincode bash
+
+$ cd chaincode002
+
+$ go build
+
+$ CORE_PEER_ADDRESS=peer:7052 CORE_CHAINCODE_ID_NAME=mycc:0 ./chaincode002
+
+终端3-操作链码
+$ docker exec -it cli bash
+
+# 安装链码
+$ peer chaincode install -p chaincodedev/chaincode/chaincode002 -n mycc -v 0
+
+# 实例化链码
+$ peer chaincode instantiate -n mycc -v 0 -c '{"Args":["str","helloworld"]}' -C myc
+查询链码
+
+# 查询链码
+$ peer chaincode query -n mycc -c '{"Args":["get","str"]}' -C myc
+
+# 运行结果
+Query Result: helloworld
+调用链码
+
+
+# 调用链码
+peer chaincode invoke -n mycc -c '{"Args":["set", "str", "helloworld111"]}' -C myc
+
+# 查询链码
+$ peer chaincode query -n mycc -c '{"Args":["get","str"]}' -C myc
+
+# 运行结果
+Query Result: helloworld111
+
+
+
+peer chaincode invoke -n mycc -c '{"Args":["set", "str1", "helloworld2"]}' -C myc
+
+
+peer chaincode query -n mycc -c '{"Args":["get","str1"]}' -C myc
+
+
+peer chaincode invoke -n mycc -c '{"Args":["set", "str222", "helloworld123123"]}' -C myc
+
+peer chaincode query -n mycc -c '{"Args":["get","str222"]}' -C myc
+
+
+
+
+
