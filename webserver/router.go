@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cloudStore/handler"
+	"github.com/cloudStore/webserver/handler"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

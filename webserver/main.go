@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/cloudStore/config"
-	"github.com/cloudStore/db"
+	"github.com/cloudStore/webserver/config"
+	"github.com/cloudStore/webserver/db"
 	"github.com/gin-gonic/gin"
 	"log"
 )

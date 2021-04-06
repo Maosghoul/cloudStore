@@ -4,7 +4,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
-	"github.com/cloudStore/db"
+	"github.com/cloudStore/webserver/db"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	DefaultFilePath = "/home/zhoushengdi/filecloud"
+	DefaultFilePath = "/home/ubuntu/filecloud"
 )
 
 func Ping(ctx *gin.Context) {
