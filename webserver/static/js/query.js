@@ -1,5 +1,5 @@
-var httpAddr = "http://10.227.64.135:6789/cs/";
-var LoginAddr = "http://10.227.64.135:6789/login";
+var httpAddr = "http://121.5.245.69:6789/cs/";
+var LoginAddr = "http://121.5.245.69:6789/login";
 
 var arr = [];
 var checkBoxIdList = new Array();
@@ -64,7 +64,7 @@ function inputFile() {
     let result = util.httpFormData(reqUrl, data)
     if (result == true) {
         alert("上传成功")
-        window.location.replace("http://10.227.64.135:6789/index")
+        window.location.replace("http://121.5.245.69:6789/index")
 
     } else {
         alert("上传失败")
@@ -127,7 +127,7 @@ function deleteFile() {
     console.log("delete file:", res)
     if (res == true) {
         alert("删除成功")
-        window.location.replace("http://10.227.64.135:6789/index")
+        window.location.replace("http://121.5.245.69:6789/index")
         return true
     }
     alert("删除失败")
