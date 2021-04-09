@@ -1,6 +1,6 @@
 MysqlConfig:
   DBName: "other_test"
-  UserName: "zhoushengdi"
+  UserName: "root"
   PassWord: "123456zsd"
-  Host: "localhost"
+  Host: "8.140.121.31"
   Port: "3306"

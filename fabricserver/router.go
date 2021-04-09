@@ -15,4 +15,5 @@ func customizeRegister(r *gin.Engine) {
 
 	v.POST("/set_kv",handler.SetKV)
 	v.POST("/get_value",handler.GetValue)
+	v.POST("/delete_kv",handler.DeleteKV)
 }

@@ -1,6 +1,7 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"github.com/cloudStore/fabricserver/config"
 	"github.com/jinzhu/gorm"
@@ -37,4 +38,44 @@ func Init() error {
 	log.Printf("db init success")
 	Dao.conn.LogMode(true)
 	return nil
+}
+
+func (d *Db) AddKV(kv KV) error {
+	err := d.conn.Exec("INSERT INTO `kv` (`id`,`key`,`value`) VALUES(0,?,?)", kv.Key, kv.Value).Error
+	return err
+}
+
+func (d *Db) ModifyKV(kv KV) error {
+	err := d.conn.Exec("UPDATE `kv` SET `value` = ? WHERE `key` = ?",
+		kv.Value, kv.Key).Error
+	return err
+}
+
+func (d *Db) DeleteKV(kv KV) error {
+	err := d.conn.Exec("DELETE FROM `kv` WHERE `key` = ? AND `value` = ?", kv.Key, kv.Value).Error
+	return err
+}
+
+func (d *Db) GetAllKV() ([]KV, error) {
+	infos := make([]KV, 0)
+	err := d.conn.Raw("SELECT * FROM `kv`").Scan(&infos).Error
+	if err != nil {
+		return nil, err
+	}
+	return infos, nil
+}
+
+func (d *Db) GetValueByKey(key string) (string, error) {
+	infos := make([]KV, 0)
+	err := d.conn.Raw("SELECT * FROM `kv` WHERE `key` = ?", key).Scan(&infos).Error
+	if err != nil {
+		return "", err
+	}
+	if len(infos) == 0 {
+		return "", errors.New("not have this key")
+	}
+	if len(infos) != 1 {
+		return "", errors.New("to many values")
+	}
+	return infos[0].Value, nil
 }
