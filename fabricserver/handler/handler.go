@@ -3,7 +3,9 @@ package handler
 import (
 	"fmt"
 	"github.com/cloudStore/fabricserver/db"
+	"github.com/cloudStore/fabricserver/peer"
 	"github.com/gin-gonic/gin"
+	"github.com/wonderivan/logger"
 	"log"
 	"net/http"
 )
@@ -32,7 +34,7 @@ func SetKV(ctx *gin.Context) {
 	req := SetKVRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("SetKV param error:%v", err)
-		log.Printf(msg)
+		logger.Info(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
@@ -45,12 +47,20 @@ func SetKV(ctx *gin.Context) {
 		})
 		if err != nil {
 			msg := fmt.Sprintf("SetKV  error:%v", err)
-			log.Printf(msg)
+			logger.Warn("db setkv error:",msg)
 			return
 		}
+		logger.Info("db set kv success")
 	}(req)
-
-
+	err :=peer.SetKV(req.Key,req.Value)
+	if err!=nil{
+		msg := fmt.Sprintf("setkv  error:%v", err)
+		logger.Warn("peer setkv error:",msg)
+		ctx.JSON(http.StatusBadRequest, map[string]string{
+			"message": msg,
+		})
+		return
+	}
 	msg := fmt.Sprintf("SetKV param success")
 	log.Printf(msg)
 	ctx.JSON(http.StatusOK, map[string]string{
@@ -63,20 +73,23 @@ func GetValue(ctx *gin.Context) {
 	req := GetValuesRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("GetValue param error:%v", err)
-		log.Printf(msg)
+		logger.Info(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
 		return
 	}
-	value, err := db.Dao.GetValueByKey(req.Key)
-	if err != nil {
-		msg := fmt.Sprintf("GetValue  error:%v", err)
-		log.Printf(msg)
-		ctx.JSON(http.StatusBadRequest, map[string]string{
-			"message": msg,
-		})
-		return
+	value ,err := peer.GetValue(req.Key)
+	if err!=nil{
+		value, err = db.Dao.GetValueByKey(req.Key)
+		if err!=nil{
+			msg := fmt.Sprintf("GetValue  error:%v", err)
+			log.Printf(msg)
+			ctx.JSON(http.StatusBadRequest, map[string]string{
+				"message": msg,
+			})
+			return
+		}
 	}
 	ctx.JSON(http.StatusOK, value)
 }
@@ -85,7 +98,7 @@ func DeleteKV(ctx *gin.Context) {
 	req := DELETEKVRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("DeleteKV param error:%v", err)
-		log.Printf(msg)
+		logger.Info(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
