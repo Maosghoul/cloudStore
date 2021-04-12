@@ -46,9 +46,15 @@ func (d *Db) AddKV(kv KV) error {
 }
 
 func (d *Db) ModifyKV(kv KV) error {
-	err := d.conn.Exec("UPDATE `kv` SET `value` = ? WHERE `key` = ?",
-		kv.Value, kv.Key).Error
-	return err
+	cmd := d.conn.Exec("UPDATE `kv` SET `value` = ? WHERE `key` = ?",
+		kv.Value, kv.Key)
+	if cmd.Error!=nil{
+		return cmd.Error
+	}
+	if cmd.RowsAffected==0{
+		cmd.Error =d.AddKV(kv)
+	}
+	return cmd.Error
 }
 
 func (d *Db) DeleteKV(kv KV) error {

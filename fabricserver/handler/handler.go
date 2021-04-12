@@ -38,18 +38,19 @@ func SetKV(ctx *gin.Context) {
 		})
 		return
 	}
-	err := db.Dao.ModifyKV(db.KV{
-		Key:   req.Key,
-		Value: req.Value,
-	})
-	if err != nil {
-		msg := fmt.Sprintf("SetKV  error:%v", err)
-		log.Printf(msg)
-		ctx.JSON(http.StatusBadRequest, map[string]string{
-			"message": msg,
+	go func(req SetKVRequest){
+		err := db.Dao.ModifyKV(db.KV{
+			Key:   req.Key,
+			Value: req.Value,
 		})
-		return
-	}
+		if err != nil {
+			msg := fmt.Sprintf("SetKV  error:%v", err)
+			log.Printf(msg)
+			return
+		}
+	}(req)
+
+
 	msg := fmt.Sprintf("SetKV param success")
 	log.Printf(msg)
 	ctx.JSON(http.StatusOK, map[string]string{
@@ -90,18 +91,18 @@ func DeleteKV(ctx *gin.Context) {
 		})
 		return
 	}
-	err := db.Dao.DeleteKV(db.KV{
-		Key:   req.Key,
-		Value: req.Value,
-	})
-	if err != nil {
-		msg := fmt.Sprintf("DeleteKV  error:%v", err)
-		log.Printf(msg)
-		ctx.JSON(http.StatusBadRequest, map[string]string{
-			"message": msg,
+	go func(req DELETEKVRequest){
+		err := db.Dao.ModifyKV(db.KV{
+			Key:   req.Key,
+			Value: "deleted",
 		})
-		return
-	}
+		if err != nil {
+			msg := fmt.Sprintf("DeleteKV  error:%v", err)
+			log.Printf(msg)
+			return
+		}
+	}(req)
+
 	msg := fmt.Sprintf("delete kv param success")
 	log.Printf(msg)
 	ctx.JSON(http.StatusOK, map[string]string{
