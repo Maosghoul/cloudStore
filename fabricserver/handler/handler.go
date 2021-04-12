@@ -29,6 +29,9 @@ type DELETEKVRequest struct {
 	Value string `json:"value"`
 }
 
+// code 0 : success
+// code 1 : failed
+
 func SetKV(ctx *gin.Context) {
 	req := SetKVRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
@@ -36,6 +39,7 @@ func SetKV(ctx *gin.Context) {
 		logger.Info(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
+			"code":    "1",
 		})
 		return
 	}
@@ -45,6 +49,7 @@ func SetKV(ctx *gin.Context) {
 		logger.Warn("peer setkv error:", msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
+			"code":    "1",
 		})
 		return
 	}
@@ -52,6 +57,7 @@ func SetKV(ctx *gin.Context) {
 	log.Printf(msg)
 	ctx.JSON(http.StatusOK, map[string]string{
 		"message": msg,
+		"code":    "0",
 	})
 
 }
@@ -63,6 +69,7 @@ func GetValue(ctx *gin.Context) {
 		logger.Info(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
+			"code":    "1",
 		})
 		return
 	}
@@ -72,9 +79,22 @@ func GetValue(ctx *gin.Context) {
 		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
+			"code":    "1",
 		})
 	}
-	ctx.JSON(http.StatusOK, value)
+
+	if value == "delete" {
+		msg := fmt.Sprintf("the key was deleted")
+		logger.Warn(msg)
+		ctx.JSON(http.StatusInternalServerError, map[string]string{
+			"message": msg,
+			"code":    "1",
+		})
+	}
+	ctx.JSON(http.StatusOK, map[string]string{
+		"code":  "0",
+		"value": value,
+	})
 }
 
 func DeleteKV(ctx *gin.Context) {
@@ -84,6 +104,7 @@ func DeleteKV(ctx *gin.Context) {
 		logger.Info(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
+			"code":    "1",
 		})
 		return
 	}
@@ -93,6 +114,7 @@ func DeleteKV(ctx *gin.Context) {
 		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
+			"code":    "1",
 		})
 		return
 	}
@@ -100,6 +122,7 @@ func DeleteKV(ctx *gin.Context) {
 	logger.Info(msg)
 	ctx.JSON(http.StatusOK, map[string]string{
 		"message": msg,
+		"code":    "0",
 	})
 
 }

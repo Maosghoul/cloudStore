@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-func Init(){
+func Init() {
 	var err error
 	defer func() {
 		if e := recover(); e != nil {
