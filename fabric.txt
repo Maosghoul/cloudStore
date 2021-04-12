@@ -1,0 +1,39 @@
+1. 启动ordered节点
+   cd fabric-1.1.0-preview-demo
+   source .order_profile   // 环境变量
+   orderer  // 启动order
+
+2. 启动peer节点 打开一个新终端
+   cd fabric-1.1.0-preview-demo
+   source .peer_profile  // 环境变量
+   peer node start -o 127.0.0.1:7050 --peer-chaincodedev=true // 启动peer
+
+3. 启动链码 
+   export CORE_CHAINCODE_ID_NAME=setkv:1.0
+   export CORE_PEER_ADDRESS=peer.example.com:7052
+   go run $GOPATH/src/github.com/hyperledger/fabric/examples/chaincode/go/chaincode_setkv/setkv.go
+
+4. 部署 
+   cd fabric-1.1.0-preview-demo
+   source .channel_profile
+[install链码]
+peer chaincode install -n setkv -v 1.0 -p github.com/hyperledger/fabric/examples/chaincode/go/chaincode_setkv/
+
+(如果已经安装，就不需要此步骤）
+
+[instantiate链码]
+peer chaincode instantiate -o orderer.example.com:7050 -C $CHANNEL_NAME -n setkv -v 1.0 -c '{"Args":["str","helloworld"]}'
+
+peer chaincode instantiate -o orderer.example.com:7050 -C $CHANNEL_NAME -n setkv -v 1.0 -c '{"Args":["str","helloworld"]}' -P "OR('OrgMSP.member')"
+
+
+[调用链码] 
+
+peer chaincode invoke -o orderer.example.com:7050 -C $CHANNEL_NAME -n setkv -c  '{"Args":["set", "str", "helloworld111"]}'
+
+peer chaincode invoke -o orderer.example.com:7050 -C $CHANNEL_NAME -n setkv -c  '{"Args":["get", "str"]}'
+
+peer chaincode invoke -o orderer.example.com:7050 -C $CHANNEL_NAME -n setkv -c  '{"Args":["set", "str", "helloworld2222"]}'
+
+
+
