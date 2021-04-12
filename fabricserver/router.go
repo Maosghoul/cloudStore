@@ -13,7 +13,7 @@ func register(r *gin.Engine) {
 func customizeRegister(r *gin.Engine) {
 	v := r.Group("/fabric")
 
-	v.POST("/set_kv",handler.SetKV)
-	v.POST("/get_value",handler.GetValue)
-	v.POST("/delete_kv",handler.DeleteKV)
+	v.POST("/set_kv", handler.SetKV)
+	v.POST("/get_value", handler.GetValue)
+	v.POST("/delete_kv", handler.DeleteKV)
 }

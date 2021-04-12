@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/cloudStore/fabricserver/config"
-	"github.com/cloudStore/fabricserver/db"
 	"github.com/gin-gonic/gin"
 	"log"
 )
@@ -15,10 +14,6 @@ func Init(){
 		}
 	}()
 	err = config.Init()
-	if err != nil {
-		panic(err)
-	}
-	err = db.Init()
 	if err != nil {
 		panic(err)
 	}
