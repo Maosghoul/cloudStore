@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/cloudStore/webserver/db"
+	"github.com/cloudStore/webserver/fabric"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
 	"net/http"
@@ -41,6 +42,11 @@ type ModifyRequest struct {
 
 type DeleteFileRequest struct {
 	Username string   `json:"username"`
+	FileName []string `json:"filename"`
+}
+
+type AdultFileRequest struct{
+	Username string `json:"username"`
 	FileName []string `json:"filename"`
 }
 
@@ -156,7 +162,7 @@ func UploadFile(ctx *gin.Context) {
 		msg := fmt.Sprintf("Upload param error:%v", err)
 		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
-			"Modify error": msg,
+			"message": msg,
 		})
 		return
 	}
@@ -165,10 +171,22 @@ func UploadFile(ctx *gin.Context) {
 		msg := fmt.Sprint("username or id is nil")
 		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
-			"Modify error": msg,
+			"message": msg,
 		})
 		return
 	}
+	uniqueKey := fabric.GenerateUniqueKey(username, file.Filename)
+	uniqueValue, err := fabric.GetFileValue(file)
+	err = fabric.SetKV(uniqueKey, uniqueValue)
+	if err!=nil{
+		msg := fmt.Sprint("upload fabric network failed")
+		logger.Warn(msg)
+		ctx.JSON(http.StatusInternalServerError,map[string]string{
+			"message":msg,
+		})
+		return
+	}
+
 	fileDir := fmt.Sprintf("%s/%s", DefaultFilePath, username)
 	fmt.Println(fileDir)
 	os.MkdirAll(fileDir, os.ModePerm)
@@ -280,4 +298,64 @@ func ListFile(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, resp)
 
+}
+
+func AdultFile(ctx *gin.Context){
+	req := AdultFileRequest{}
+	if err := ctx.ShouldBind(&req); err != nil {
+		msg := fmt.Sprintf("AdultFile param error:%v", err)
+		logger.Warn(msg)
+		ctx.JSON(http.StatusBadRequest, map[string]string{
+			"code":"1",
+			"message": msg,
+		})
+		return
+	}
+	fileInfos := make([]db.FileInfo, 0)
+	for _, v := range req.FileName {
+		fileInfos = append(fileInfos, db.FileInfo{
+			Username: req.Username,
+			Filename: v,
+		})
+	}
+	fileKV :=make([]fabric.KV,0)
+	fileDir := fmt.Sprintf("%s/%s", DefaultFilePath, req.Username)
+	for _, info := range fileInfos {
+		uniqueKey := fabric.GenerateUniqueKey(info.Username,info.Filename)
+		dst := fmt.Sprintf("%s/%s", fileDir, info.Filename)
+		uniqueValue ,err := fabric.GetPathFileValue(dst)
+		if err!=nil{
+			msg := fmt.Sprintf("AdultFile  error:%v", err)
+			logger.Warn(msg)
+			ctx.JSON(http.StatusInternalServerError, map[string]string{
+				"code":"1",
+				"message": msg,
+			})
+			return
+		}
+		fileKV = append(fileKV ,fabric.KV{
+			Key: uniqueKey,
+			Value: uniqueValue,
+		})
+	}
+	notPass :=make([]string,0)
+	for _,kv:=range fileKV{
+		value ,_:= fabric.GetValue(kv.Key)
+		if value != kv.Value{
+			notPass = append(notPass,kv.Key)
+		}
+	}
+	if len(notPass)==0{
+		msg :=fmt.Sprintf("All file pass the adult")
+		ctx.JSON(http.StatusOK,map[string]string{
+			"code":"0",
+			"message":msg,
+		})
+	}else{
+		msg := fmt.Sprintf("file %v do not pass the adult",notPass)
+		ctx.JSON(http.StatusOK,map[string]string{
+			"code":"-1",
+			"message":msg,
+		})
+	}
 }

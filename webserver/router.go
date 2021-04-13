@@ -22,6 +22,7 @@ func customizeRegister(r *gin.Engine) {
 	v.POST("/upload_file", handler.UploadFile)
 	v.POST("/delete_file", handler.DeleteFile)
 	v.POST("/list_file", handler.ListFile)
+	v.POST("/adult_file",handler.AdultFile)
 }
 
 func loadHTML(r *gin.Engine) {
