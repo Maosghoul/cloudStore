@@ -177,6 +177,7 @@ func UploadFile(ctx *gin.Context) {
 	}
 	uniqueKey := fabric.GenerateUniqueKey(username, file.Filename)
 	uniqueValue, err := fabric.GetFileValue(file)
+	logger.Info("file key and value:",uniqueKey,uniqueValue)
 	err = fabric.SetKV(uniqueKey, uniqueValue)
 	if err!=nil{
 		msg := fmt.Sprint("upload fabric network failed")

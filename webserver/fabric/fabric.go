@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/sha256"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/wonderivan/logger"
 	"io"
@@ -69,25 +68,33 @@ func GetPathFileValue(path string)(string,error){
 	return sum, nil
 }
 
-func HTTPPost(url string, content []byte) ([]byte, error) {
-	logger.Info("http post info", "url is:"+url)
-	client := &http.Client{
-		Timeout: HTTPTimeout * time.Second,
-	}
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(content))
+func Post(url string, data interface{}) ([]byte,error) {
+	jsonStr, _ := json.Marshal(data)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	logger.Info("http req is :",req)
+	req.Header.Add("content-type", "application/json")
 	if err != nil {
-		return nil, errors.New("init http post error")
+		logger.Warn("http post error",err)
+		return nil,err
 	}
+	defer req.Body.Close()
+
+	client := &http.Client{Timeout: HTTPTimeout * time.Second}
 	resp, err := client.Do(req)
+	if err != nil {
+		logger.Warn("http post error",err)
+		return nil,err
+	}
 	defer resp.Body.Close()
 
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return nil, errors.New("ioutil read body error")
+	result, err:= ioutil.ReadAll(resp.Body)
+	if err!=nil{
+		logger.Warn("http post error",err)
+		return nil,err
 	}
-	logger.Info("resp is ", string(body))
-	return body, nil
+	return result,nil
 }
+
 
 func SetKV(key string, value string) error {
 	url := fmt.Sprintf("http://%s:%s/fabric/set_kv",FabricServerHost,FabricSerrverPort)
@@ -95,12 +102,7 @@ func SetKV(key string, value string) error {
 		Key:   key,
 		Value: value,
 	}
-	reqBody, err := json.Marshal(kv)
-	if err != nil {
-		logger.Warn("SetKv failed:", err.Error())
-		return err
-	}
-	respBody, err := HTTPPost(url, reqBody)
+	respBody, err := Post(url, kv)
 	if err != nil {
 		logger.Warn("SetKv failed:", err.Error())
 		return err
@@ -119,16 +121,11 @@ type GetValueReq struct {
 }
 
 func GetValue(key string) (string, error) {
-	url := fmt.Sprintf("http://%s:%s/fabric/set_kv",FabricServerHost,FabricSerrverPort)
+	url := fmt.Sprintf("http://%s:%s/fabric/get_value",FabricServerHost,FabricSerrverPort)
 	req := GetValueReq{
 		Key: key,
 	}
-	reqBody, err := json.Marshal(req)
-	if err != nil {
-		logger.Warn("GetValue failed:", err.Error())
-		return "", err
-	}
-	respBody, err := HTTPPost(url, reqBody)
+	respBody, err := Post(url, req)
 	if err != nil {
 		logger.Warn("GetValue failed:", err.Error())
 		return "", err
