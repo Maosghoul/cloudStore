@@ -154,11 +154,11 @@ function adultFile() {
     let res = util.httpPostWithResp(reqUrl, JSON.stringify(cmd))
     console.log("delete file:", res)
     console.log("res code :",res.code)
-    console.log("res code :",res.message)
+    console.log("res message :",res.message)
     if (res.code =="0"){
         alert("所选文件通过审计")
     }else{
-        alert("所选文件未通过审计：",res.message)
+        alert("所选文件"+res.message+"未通过审计")
     }
     window.location.replace("http://121.5.245.69:6789/index")
 }

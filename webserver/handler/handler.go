@@ -10,6 +10,7 @@ import (
 	"github.com/wonderivan/logger"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
@@ -343,7 +344,9 @@ func AdultFile(ctx *gin.Context){
 	for _,kv:=range fileKV{
 		value ,_:= fabric.GetValue(kv.Key)
 		if value != kv.Value{
-			notPass = append(notPass,kv.Key)
+			idx := strings.LastIndex(kv.Key,"$")
+			tmpName := kv.Key[idx+1:]
+			notPass = append(notPass,tmpName)
 		}
 	}
 	if len(notPass)==0{
@@ -353,7 +356,7 @@ func AdultFile(ctx *gin.Context){
 			"message":msg,
 		})
 	}else{
-		msg := fmt.Sprintf("file %v do not pass the adult",notPass)
+		msg := fmt.Sprintf("%v",notPass)
 		ctx.JSON(http.StatusOK,map[string]string{
 			"code":"-1",
 			"message":msg,
