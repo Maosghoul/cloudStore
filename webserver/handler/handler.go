@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/cloudStore/webserver/db"
 	"github.com/gin-gonic/gin"
-	"log"
+	"github.com/wonderivan/logger"
 	"net/http"
 	"os"
 	"time"
@@ -62,7 +62,7 @@ func Login(ctx *gin.Context) {
 	req := LoginRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("Login param error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
@@ -71,7 +71,7 @@ func Login(ctx *gin.Context) {
 	user, err := db.Dao.FindUserByUsername(req.Username)
 	if err != nil || user == nil {
 		msg := fmt.Sprintf("Login  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -80,7 +80,7 @@ func Login(ctx *gin.Context) {
 	pass := fmt.Sprintf("%x", sha256.Sum256([]byte(req.Password)))
 	if user.Password != pass {
 		msg := fmt.Sprintf("Login  error:%v", errors.New("password is not true"))
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -96,7 +96,7 @@ func Register(ctx *gin.Context) {
 	req := RegisterRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("Register param error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"Register error": msg,
 		})
@@ -109,7 +109,7 @@ func Register(ctx *gin.Context) {
 	}
 	if err := db.Dao.AddUser(user); err != nil {
 		msg := fmt.Sprintf("Register  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -125,7 +125,7 @@ func Modify(ctx *gin.Context) {
 	req := ModifyRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("Modify param error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"Modify error": msg,
 		})
@@ -138,7 +138,7 @@ func Modify(ctx *gin.Context) {
 	}
 	if err := db.Dao.ModifyUser(user); err != nil {
 		msg := fmt.Sprintf("Modify  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -154,7 +154,7 @@ func UploadFile(ctx *gin.Context) {
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		msg := fmt.Sprintf("Upload param error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"Modify error": msg,
 		})
@@ -163,7 +163,7 @@ func UploadFile(ctx *gin.Context) {
 	username := ctx.PostForm("username")
 	if username == "" {
 		msg := fmt.Sprint("username or id is nil")
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"Modify error": msg,
 		})
@@ -176,7 +176,7 @@ func UploadFile(ctx *gin.Context) {
 	dst := fmt.Sprintf("%s/%s", fileDir, file.Filename)
 	if err := ctx.SaveUploadedFile(file, dst); err != nil {
 		msg := fmt.Sprintf("UploadFile  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -190,7 +190,7 @@ func UploadFile(ctx *gin.Context) {
 	err = db.Dao.AddFile(fileInfo)
 	if err != nil {
 		msg := fmt.Sprintf("UploadFile  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -206,7 +206,7 @@ func DeleteFile(ctx *gin.Context) {
 	req := DeleteFileRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("DeleteFile param error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
@@ -225,7 +225,7 @@ func DeleteFile(ctx *gin.Context) {
 		dst := fmt.Sprintf("%s/%s", fileDir, info.Filename)
 		if err := os.Remove(dst); err != nil {
 			msg := fmt.Sprintf("DeleteFile  error:%v", err)
-			log.Printf(msg)
+			logger.Warn(msg)
 			ctx.JSON(http.StatusInternalServerError, map[string]string{
 				"message": msg,
 			})
@@ -236,7 +236,7 @@ func DeleteFile(ctx *gin.Context) {
 	err := db.Dao.DeleteFile(fileInfos)
 	if err != nil {
 		msg := fmt.Sprintf("DeleteFile  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -253,7 +253,7 @@ func ListFile(ctx *gin.Context) {
 	req := ListFileRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("List file  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
@@ -264,7 +264,7 @@ func ListFile(ctx *gin.Context) {
 	output, err := db.Dao.ListFile(info)
 	if err != nil {
 		msg := fmt.Sprintf("List file  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
