@@ -4,16 +4,19 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
-	"github.com/cloudStore/db"
+	"github.com/cloudStore/webserver/db"
+	"github.com/cloudStore/webserver/fabric"
 	"github.com/gin-gonic/gin"
-	"log"
+	"github.com/wonderivan/logger"
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 )
 
 const (
-	DefaultFilePath = "/home/zhoushengdi/filecloud"
+	DefaultFilePath = "/home/ubuntu/filecloud"
 )
 
 func Ping(ctx *gin.Context) {
@@ -44,6 +47,17 @@ type DeleteFileRequest struct {
 	FileName []string `json:"filename"`
 }
 
+type AdultFileRequest struct{
+	Username string `json:"username"`
+	FileName []string `json:"filename"`
+}
+
+type DownloadFileRequest struct{
+	Username string `json:"username"`
+	FileName string `json:"filename"`
+}
+
+
 type ListFileRequest struct {
 	Username string `json:"username"`
 }
@@ -62,7 +76,7 @@ func Login(ctx *gin.Context) {
 	req := LoginRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("Login param error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
@@ -71,7 +85,7 @@ func Login(ctx *gin.Context) {
 	user, err := db.Dao.FindUserByUsername(req.Username)
 	if err != nil || user == nil {
 		msg := fmt.Sprintf("Login  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -80,7 +94,7 @@ func Login(ctx *gin.Context) {
 	pass := fmt.Sprintf("%x", sha256.Sum256([]byte(req.Password)))
 	if user.Password != pass {
 		msg := fmt.Sprintf("Login  error:%v", errors.New("password is not true"))
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -96,7 +110,7 @@ func Register(ctx *gin.Context) {
 	req := RegisterRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("Register param error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"Register error": msg,
 		})
@@ -109,7 +123,7 @@ func Register(ctx *gin.Context) {
 	}
 	if err := db.Dao.AddUser(user); err != nil {
 		msg := fmt.Sprintf("Register  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -125,7 +139,7 @@ func Modify(ctx *gin.Context) {
 	req := ModifyRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("Modify param error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"Modify error": msg,
 		})
@@ -138,7 +152,7 @@ func Modify(ctx *gin.Context) {
 	}
 	if err := db.Dao.ModifyUser(user); err != nil {
 		msg := fmt.Sprintf("Modify  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -154,21 +168,34 @@ func UploadFile(ctx *gin.Context) {
 	file, err := ctx.FormFile("file")
 	if err != nil {
 		msg := fmt.Sprintf("Upload param error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
-			"Modify error": msg,
+			"message": msg,
 		})
 		return
 	}
 	username := ctx.PostForm("username")
 	if username == "" {
 		msg := fmt.Sprint("username or id is nil")
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
-			"Modify error": msg,
+			"message": msg,
 		})
 		return
 	}
+	uniqueKey := fabric.GenerateUniqueKey(username, file.Filename)
+	uniqueValue, err := fabric.GetFileValue(file)
+	logger.Info("file key and value:",uniqueKey,uniqueValue)
+	err = fabric.SetKV(uniqueKey, uniqueValue)
+	if err!=nil{
+		msg := fmt.Sprint("upload fabric network failed")
+		logger.Warn(msg)
+		ctx.JSON(http.StatusInternalServerError,map[string]string{
+			"message":msg,
+		})
+		return
+	}
+
 	fileDir := fmt.Sprintf("%s/%s", DefaultFilePath, username)
 	fmt.Println(fileDir)
 	os.MkdirAll(fileDir, os.ModePerm)
@@ -176,7 +203,7 @@ func UploadFile(ctx *gin.Context) {
 	dst := fmt.Sprintf("%s/%s", fileDir, file.Filename)
 	if err := ctx.SaveUploadedFile(file, dst); err != nil {
 		msg := fmt.Sprintf("UploadFile  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -190,7 +217,7 @@ func UploadFile(ctx *gin.Context) {
 	err = db.Dao.AddFile(fileInfo)
 	if err != nil {
 		msg := fmt.Sprintf("UploadFile  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -206,7 +233,7 @@ func DeleteFile(ctx *gin.Context) {
 	req := DeleteFileRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("DeleteFile param error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
@@ -225,7 +252,7 @@ func DeleteFile(ctx *gin.Context) {
 		dst := fmt.Sprintf("%s/%s", fileDir, info.Filename)
 		if err := os.Remove(dst); err != nil {
 			msg := fmt.Sprintf("DeleteFile  error:%v", err)
-			log.Printf(msg)
+			logger.Warn(msg)
 			ctx.JSON(http.StatusInternalServerError, map[string]string{
 				"message": msg,
 			})
@@ -236,7 +263,7 @@ func DeleteFile(ctx *gin.Context) {
 	err := db.Dao.DeleteFile(fileInfos)
 	if err != nil {
 		msg := fmt.Sprintf("DeleteFile  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusInternalServerError, map[string]string{
 			"message": msg,
 		})
@@ -253,7 +280,7 @@ func ListFile(ctx *gin.Context) {
 	req := ListFileRequest{}
 	if err := ctx.ShouldBind(&req); err != nil {
 		msg := fmt.Sprintf("List file  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
@@ -264,7 +291,7 @@ func ListFile(ctx *gin.Context) {
 	output, err := db.Dao.ListFile(info)
 	if err != nil {
 		msg := fmt.Sprintf("List file  error:%v", err)
-		log.Printf(msg)
+		logger.Warn(msg)
 		ctx.JSON(http.StatusBadRequest, map[string]string{
 			"message": msg,
 		})
@@ -280,4 +307,110 @@ func ListFile(ctx *gin.Context) {
 	}
 	ctx.JSON(http.StatusOK, resp)
 
+}
+
+func AdultFile(ctx *gin.Context){
+	req := AdultFileRequest{}
+	if err := ctx.ShouldBind(&req); err != nil {
+		msg := fmt.Sprintf("AdultFile param error:%v", err)
+		logger.Warn(msg)
+		ctx.JSON(http.StatusBadRequest, map[string]string{
+			"code":"1",
+			"message": msg,
+		})
+		return
+	}
+	fileInfos := make([]db.FileInfo, 0)
+	for _, v := range req.FileName {
+		fileInfos = append(fileInfos, db.FileInfo{
+			Username: req.Username,
+			Filename: v,
+		})
+	}
+	fileKV :=make([]fabric.KV,0)
+	fileDir := fmt.Sprintf("%s/%s", DefaultFilePath, req.Username)
+	for _, info := range fileInfos {
+		uniqueKey := fabric.GenerateUniqueKey(info.Username,info.Filename)
+		dst := fmt.Sprintf("%s/%s", fileDir, info.Filename)
+		uniqueValue ,err := fabric.GetPathFileValue(dst)
+		if err!=nil{
+			msg := fmt.Sprintf("AdultFile  error:%v", err)
+			logger.Warn(msg)
+			ctx.JSON(http.StatusInternalServerError, map[string]string{
+				"code":"1",
+				"message": msg,
+			})
+			return
+		}
+		fileKV = append(fileKV ,fabric.KV{
+			Key: uniqueKey,
+			Value: uniqueValue,
+		})
+	}
+	notPass :=make([]string,0)
+	for _,kv:=range fileKV{
+		value ,_:= fabric.GetValue(kv.Key)
+		if value != kv.Value{
+			idx := strings.LastIndex(kv.Key,"$")
+			tmpName := kv.Key[idx+1:]
+			notPass = append(notPass,tmpName)
+		}
+	}
+	if len(notPass)==0{
+		msg :=fmt.Sprintf("All file pass the adult")
+		ctx.JSON(http.StatusOK,map[string]string{
+			"code":"0",
+			"message":msg,
+		})
+	}else{
+		msg := fmt.Sprintf("%v",notPass)
+		ctx.JSON(http.StatusOK,map[string]string{
+			"code":"-1",
+			"message":msg,
+		})
+	}
+}
+
+func DownloadFile(ctx *gin.Context){
+	req := DownloadFileRequest{}
+	req.Username,_ = ctx.GetQuery("username")
+	req.FileName ,_= ctx.GetQuery("filename")
+	fileInfos := make([]db.FileInfo, 0)
+		fileInfos = append(fileInfos, db.FileInfo{
+			Username: req.Username,
+			Filename: req.FileName,
+		})
+
+	fileDir := fmt.Sprintf("%s/%s", DefaultFilePath, req.Username)
+	fmt.Println(fileDir)
+	for _, info := range fileInfos {
+		dst := fmt.Sprintf("%s/%s", fileDir, info.Filename)
+		logger.Info("dst is :",dst)
+		f,err := os.Open(dst)
+		if err!=nil{
+			msg := fmt.Sprintf("DownloadFile  error:%v", err)
+			logger.Warn(msg)
+			ctx.JSON(http.StatusBadRequest, map[string]string{
+				"code":"1",
+				"message": msg,
+			})
+			return
+		}
+		fileContent ,err :=ioutil.ReadAll(f)
+		if err!=nil || fileContent==nil{
+			msg := fmt.Sprintf("DownloadFile  error:%v", err)
+			logger.Warn(msg)
+			ctx.JSON(http.StatusInternalServerError, map[string]string{
+				"code":"1",
+				"message": msg,
+			})
+			return
+		}
+		logger.Info("fileContent",string(fileContent))
+		ctx.Writer.Header().Add("content-type","application/octet-stream;charset=utf-8")
+		ctx.Writer.Header().Add("content-disposition",fmt.Sprintf("attachment; filename=\"%s\"", info.Filename))
+		ctx.Writer.Write(fileContent)
+		f.Close()
+	}
+	logger.Info("download file success")
 }

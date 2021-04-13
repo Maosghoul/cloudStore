@@ -29,3 +29,10 @@ UPDATE `file` SET `filename` = ?,`update_time` = ? WHERE `username` = ?
 DELETE from `file` WHERE `username` = ? AND `filename` = ?
 
 SELECT * FROM `file` WHERE `username` = ?
+
+CREATE TABLE `kv` (
+	`id` int unsigned NOT NULL AUTO_INCREMENT COMMENT 'ID',
+	`key` varchar(255) NOT NULL DEFAULT '' COMMENT 'key',
+	`value` varchar(255) NOT NULL DEFAULT '' COMMENT 'value',
+	PRIMARY KEY (`id`)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8

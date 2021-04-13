@@ -1,8 +1,7 @@
 package main
 
 import (
-	"github.com/cloudStore/webserver/config"
-	"github.com/cloudStore/webserver/db"
+	"github.com/cloudStore/fabricserver/config"
 	"github.com/gin-gonic/gin"
 	"log"
 )
@@ -18,10 +17,6 @@ func Init() {
 	if err != nil {
 		panic(err)
 	}
-	err = db.Init()
-	if err != nil {
-		panic(err)
-	}
 }
 
 func main() {
@@ -32,8 +27,5 @@ func main() {
 			log.Printf("run gin error:%v\n", err)
 		}
 	}()
-	r.Static("/static", "./static")
-	r.LoadHTMLGlob("./static/html/*")
-	loadHTML(r)
 	register(r)
 }

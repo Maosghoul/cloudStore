@@ -1,5 +1,5 @@
-var httpAddr = "http://10.227.64.135:6789/cs/";
-var LoginAddr = "http://10.227.64.135:6789/login";
+var httpAddr = "http://121.5.245.69:6789/cs/";
+var LoginAddr = "http://121.5.245.69:6789/login";
 
 var arr = [];
 var checkBoxIdList = new Array();
@@ -64,7 +64,7 @@ function inputFile() {
     let result = util.httpFormData(reqUrl, data)
     if (result == true) {
         alert("上传成功")
-        window.location.replace("http://10.227.64.135:6789/index")
+        window.location.replace("http://121.5.245.69:6789/index")
 
     } else {
         alert("上传失败")
@@ -127,7 +127,7 @@ function deleteFile() {
     console.log("delete file:", res)
     if (res == true) {
         alert("删除成功")
-        window.location.replace("http://10.227.64.135:6789/index")
+        window.location.replace("http://121.5.245.69:6789/index")
         return true
     }
     alert("删除失败")
@@ -135,5 +135,51 @@ function deleteFile() {
 }
 
 function adultFile() {
+    var username = util.getItem("username")
+    if (username == null) {
+        window.location.href = LoginAddr
+        alert("请先登录")
+    }
+    var filename = []
+    for (var i = 0; i < arr.length; i++) {
+        if (checkBoxIdList[i + 1] == 1) {
+            filename.push(arr[i].name)
+        }
+    }
+    var reqUrl = httpAddr + "adult_file"
+    var cmd = {
+        'username': username,
+        'filename': filename
+    }
+    let res = util.httpPostWithResp(reqUrl, JSON.stringify(cmd))
+    console.log("delete file:", res)
+    console.log("res code :",res.code)
+    console.log("res message :",res.message)
+    if (res.code =="0"){
+        alert("所选文件通过审计")
+    }else{
+        alert("所选文件"+res.message+"未通过审计")
+    }
+    window.location.replace("http://121.5.245.69:6789/index")
+}
+
+function downLoadFile(){
+    var username = util.getItem("username")
+    if (username == null) {
+        window.location.href = LoginAddr
+        alert("请先登录")
+    }
+    var filename = []
+    for (var i = 0; i < arr.length; i++) {
+        if (checkBoxIdList[i + 1] == 1) {
+            filename.push(arr[i].name)
+        }
+    }
+    var reqUrl = httpAddr + "download_file"
+    for (var i=0;i<filename.length;i++){
+        let url = reqUrl + "?username="+username + "&filename="+filename[i]
+        console.log("url is",url)
+        util.httpGet(url)
+    }
     return true
 }

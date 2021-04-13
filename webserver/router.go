@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/cloudStore/handler"
+	"github.com/cloudStore/webserver/handler"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -22,6 +22,8 @@ func customizeRegister(r *gin.Engine) {
 	v.POST("/upload_file", handler.UploadFile)
 	v.POST("/delete_file", handler.DeleteFile)
 	v.POST("/list_file", handler.ListFile)
+	v.POST("/adult_file",handler.AdultFile)
+	v.GET("/download_file",handler.DownloadFile)
 }
 
 func loadHTML(r *gin.Engine) {

@@ -2,7 +2,7 @@ package db
 
 import (
 	"fmt"
-	"github.com/cloudStore/config"
+	"github.com/cloudStore/webserver/config"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"log"

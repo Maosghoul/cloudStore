@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="5c2d69b1-1330-418a-a347-1c21bd52f245" name="dv" url="http://121.5.245.69">
+        <fileTransfer rootFolder="/home/ubuntu/gopath/src/github.com/cloudStore" accessType="SFTP" host="121.5.245.69" port="22" sshConfigId="39841227-7ba4-4db5-ae92-4aace22eed58" sshConfig="ubuntu@121.5.245.69:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
