@@ -135,5 +135,30 @@ function deleteFile() {
 }
 
 function adultFile() {
-    return true
+    var username = util.getItem("username")
+    if (username == null) {
+        window.location.href = LoginAddr
+        alert("请先登录")
+    }
+    var filename = []
+    for (var i = 0; i < arr.length; i++) {
+        if (checkBoxIdList[i + 1] == 1) {
+            filename.push(arr[i].name)
+        }
+    }
+    var reqUrl = httpAddr + "adult_file"
+    var cmd = {
+        'username': username,
+        'filename': filename
+    }
+    let res = util.httpPostWithResp(reqUrl, JSON.stringify(cmd))
+    console.log("delete file:", res)
+    console.log("res code :",res.code)
+    console.log("res code :",res.message)
+    if (res.code =="0"){
+        alert("所选文件通过审计")
+    }else{
+        alert("所选文件未通过审计：",res.message)
+    }
+    window.location.replace("http://121.5.245.69:6789/index")
 }
