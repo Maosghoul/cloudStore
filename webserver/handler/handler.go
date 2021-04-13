@@ -8,6 +8,7 @@ import (
 	"github.com/cloudStore/webserver/fabric"
 	"github.com/gin-gonic/gin"
 	"github.com/wonderivan/logger"
+	"io/ioutil"
 	"net/http"
 	"os"
 	"strings"
@@ -50,6 +51,12 @@ type AdultFileRequest struct{
 	Username string `json:"username"`
 	FileName []string `json:"filename"`
 }
+
+type DownloadFileRequest struct{
+	Username string `json:"username"`
+	FileName string `json:"filename"`
+}
+
 
 type ListFileRequest struct {
 	Username string `json:"username"`
@@ -362,4 +369,48 @@ func AdultFile(ctx *gin.Context){
 			"message":msg,
 		})
 	}
+}
+
+func DownloadFile(ctx *gin.Context){
+	req := DownloadFileRequest{}
+	req.Username,_ = ctx.GetQuery("username")
+	req.FileName ,_= ctx.GetQuery("filename")
+	fileInfos := make([]db.FileInfo, 0)
+		fileInfos = append(fileInfos, db.FileInfo{
+			Username: req.Username,
+			Filename: req.FileName,
+		})
+
+	fileDir := fmt.Sprintf("%s/%s", DefaultFilePath, req.Username)
+	fmt.Println(fileDir)
+	for _, info := range fileInfos {
+		dst := fmt.Sprintf("%s/%s", fileDir, info.Filename)
+		logger.Info("dst is :",dst)
+		f,err := os.Open(dst)
+		if err!=nil{
+			msg := fmt.Sprintf("DownloadFile  error:%v", err)
+			logger.Warn(msg)
+			ctx.JSON(http.StatusBadRequest, map[string]string{
+				"code":"1",
+				"message": msg,
+			})
+			return
+		}
+		fileContent ,err :=ioutil.ReadAll(f)
+		if err!=nil || fileContent==nil{
+			msg := fmt.Sprintf("DownloadFile  error:%v", err)
+			logger.Warn(msg)
+			ctx.JSON(http.StatusInternalServerError, map[string]string{
+				"code":"1",
+				"message": msg,
+			})
+			return
+		}
+		logger.Info("fileContent",string(fileContent))
+		ctx.Writer.Header().Add("content-type","application/octet-stream;charset=utf-8")
+		ctx.Writer.Header().Add("content-disposition",fmt.Sprintf("attachment; filename=\"%s\"", info.Filename))
+		ctx.Writer.Write(fileContent)
+		f.Close()
+	}
+	logger.Info("download file success")
 }

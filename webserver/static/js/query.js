@@ -162,3 +162,24 @@ function adultFile() {
     }
     window.location.replace("http://121.5.245.69:6789/index")
 }
+
+function downLoadFile(){
+    var username = util.getItem("username")
+    if (username == null) {
+        window.location.href = LoginAddr
+        alert("请先登录")
+    }
+    var filename = []
+    for (var i = 0; i < arr.length; i++) {
+        if (checkBoxIdList[i + 1] == 1) {
+            filename.push(arr[i].name)
+        }
+    }
+    var reqUrl = httpAddr + "download_file"
+    for (var i=0;i<filename.length;i++){
+        let url = reqUrl + "?username="+username + "&filename="+filename[i]
+        console.log("url is",url)
+        util.httpGet(url)
+    }
+    return true
+}

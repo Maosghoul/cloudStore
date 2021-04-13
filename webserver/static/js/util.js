@@ -1,11 +1,10 @@
 var util = {};
 
-util.httpGet = function (url, success, error) {
+util.httpGet = function (url, error) {
     $.ajax({
         url: url,
         type: "GET",
         async: true,
-        success: success,
         error: error
     });
 };
