@@ -52,6 +52,24 @@ func GetFileValue(file *multipart.FileHeader) (string, error) {
 	return sum, nil
 }
 
+func GetFileSize(size int64)string{
+	var filesize float64
+	filesize = 0.0
+	if size <1024{
+		filesize = float64(size)
+		return fmt.Sprintf("%.1fB",filesize)
+	}else if size>=1024&& size<1024*1024{
+		filesize = float64(size)/1024.0
+		return fmt.Sprintf("%.1fK",filesize)
+	}else if size>=1024*1024&&size<1024*1024*1024{
+		filesize = float64(size)/(1024.0*1024.0)
+		return fmt.Sprintf("%.1fM",filesize)
+	}else{
+		filesize = float64(size)/(1024.0*1024.0*1024.0)
+		return fmt.Sprintf("%.1fG",filesize)
+	}
+}
+
 func GetPathFileValue(path string)(string,error){
 	f ,err := os.Open(path)
 	defer f.Close()

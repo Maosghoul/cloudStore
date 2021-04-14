@@ -88,7 +88,7 @@ function ListFile() {
     //     console.log("res:", res.fileinfo[i].name, res.fileinfo[i].time)
     // }
     for (var i = 0; i < res.fileinfo.length; i++) {
-        arr.push({name: res.fileinfo[i].name, time: res.fileinfo[i].time})
+        arr.push({name: res.fileinfo[i].name,size:res.fileinfo[i].size, time: res.fileinfo[i].time})
     }
 
 }

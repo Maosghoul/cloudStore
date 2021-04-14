@@ -67,6 +67,7 @@ type ListFileResponse struct {
 }
 
 type FileInfo struct {
+	Size string `json:"size"`
 	Name string `json:"name"`
 	Time string `json:"time"`
 }
@@ -209,9 +210,11 @@ func UploadFile(ctx *gin.Context) {
 		})
 		return
 	}
+	logger.Info("size is",file.Size," ",fabric.GetFileSize(file.Size))
 	fileInfo := db.FileInfo{
 		Username:   username,
 		Filename:   file.Filename,
+		Filesize:   fabric.GetFileSize(file.Size),
 		UpdateTime: time.Now().Format("2006/01/02 15:04:05"),
 	}
 	err = db.Dao.AddFile(fileInfo)
@@ -302,6 +305,7 @@ func ListFile(ctx *gin.Context) {
 	for _, v := range output {
 		resp.FileInfo = append(resp.FileInfo, FileInfo{
 			Name: v.Filename,
+			Size: v.Filesize,
 			Time: v.UpdateTime,
 		})
 	}

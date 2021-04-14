@@ -43,10 +43,11 @@
                 <th>
                     <input type="checkbox" id="checkAll" value=0 />
                 </th>
-                <th>ID</th>
-                <th>NAME</th>
-                <th>TIME</th>
-                <th>DownloadLink</th>
+                <th>文件序列</th>
+                <th>文件名称</th>
+                <th>文件大小</th>
+                <th>修改时间</th>
+                <th>下载链接</th>
             </tr>
         </thead>`
     var uuname = util.getItem("username")
@@ -56,6 +57,7 @@
         tmp += '<td><input type="checkbox" value=' + (i + 1) + ' /></td>'
         tmp += '<td>' + (i + 1) + '</td>'
         tmp += '<td>' + arr[i].name + '</td>'
+        tmp += '<td>' + arr[i].size + '</td>'
         tmp += '<td>' + arr[i].time + '</td>'
         tmp += '<td><a href="http://121.5.245.69:6789/cs/download_file?username='+uuname+'&filename='+arr[i].name+'" download="'+arr[i].name+'">link</a>' + '</td>'
         tmp += '</tbody>'
