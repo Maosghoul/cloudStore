@@ -406,7 +406,6 @@ func DownloadFile(ctx *gin.Context){
 			})
 			return
 		}
-		logger.Info("fileContent",string(fileContent))
 		ctx.Writer.Header().Add("content-type","application/octet-stream;charset=utf-8")
 		ctx.Writer.Header().Add("content-disposition",fmt.Sprintf("attachment; filename=\"%s\"", info.Filename))
 		ctx.Writer.Write(fileContent)
