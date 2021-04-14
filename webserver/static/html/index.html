@@ -13,16 +13,33 @@
 
 <body>
 
-<div>
-    <input id="upfile" type="file" multiple="multiple" onchange="inputFile()"
-           style="display: none;position: absolute"/>
-    <button type="button" onclick="upfile.click()">上传文件</button>
-    <button type="button" onclick="return deleteFile()">删除文件</button>
-    <button type="button" onclick="return adultFile()">文件审计</button>
-    <button type="button" onclick="return cancel()">退出登录</button>
+<nav class="navbar navbar-light" style="background-color: #e3f2fd;">
+    <a class="navbar-brand" href="#">CloudStore平台</a>
+    <form action="./modify" class="ml-auto">
+        <input type="submit" class="btn btn-primary" value="修改账户信息" onclick="return true" />
+    </form>
+    &nbsp;&nbsp;&nbsp;
+    <button type="button" class="btn btn-primary" onclick="return cancel()">退出登录</button>
+</nav>
+
+
+<div class="container">
+    <div class="jumbotron">
+        <h1 class="display-4">区块连云存储和审计系统</h1>
+        <p>云盘页面</p>
+        <hr class="my-4">
+        <p>通过按钮上传文件，删除文件，以及审计文件</p>
+
+        <input id="upfile" type="file" multiple="multiple" onchange="inputFile()"
+               style="display: none;position: absolute"/>
+        &nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-outline-primary" onclick="upfile.click()">上传文件</button>
+        &nbsp;&nbsp;&nbsp;<button type="button"  class="btn btn-outline-primary" onclick="return deleteFile()">删除文件</button>
+        &nbsp;&nbsp;&nbsp;<button type="button" class="btn btn-outline-primary" onclick="return adultFile()">文件审计</button>
+    </div>
+
 
 </div>
-<div>
+<div class="container">
     <table class="table" id="filetable">
 
     </table>
@@ -38,15 +55,16 @@
 <script>
     checkLogin()
     ListFile()
-    innerml = `<thead>
+    innerml = `<thead class="thead-light">
             <tr>
-                <th>
+                <th scope="col">
                     <input type="checkbox" id="checkAll" value=0 />
                 </th>
-                <th>ID</th>
-                <th>NAME</th>
-                <th>TIME</th>
-                <th>DownloadLink</th>
+                <th scope="col">文件序列</th>
+                <th scope="col">文件名称</th>
+                <th scope="col">文件大小</th>
+                <th scope="col">修改时间</th>
+                <th scope="col">下载链接</th>
             </tr>
         </thead>`
     var uuname = util.getItem("username")
@@ -56,6 +74,7 @@
         tmp += '<td><input type="checkbox" value=' + (i + 1) + ' /></td>'
         tmp += '<td>' + (i + 1) + '</td>'
         tmp += '<td>' + arr[i].name + '</td>'
+        tmp += '<td>' + arr[i].size + '</td>'
         tmp += '<td>' + arr[i].time + '</td>'
         tmp += '<td><a href="http://121.5.245.69:6789/cs/download_file?username='+uuname+'&filename='+arr[i].name+'" download="'+arr[i].name+'">link</a>' + '</td>'
         tmp += '</tbody>'

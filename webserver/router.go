@@ -42,4 +42,9 @@ func loadHTML(r *gin.Engine) {
 			"title": "注册",
 		})
 	})
+	r.GET("/modify", func(context *gin.Context) {
+		context.HTML(http.StatusOK, "modify.html", gin.H{
+			"title": "信息修改",
+		})
+	})
 }

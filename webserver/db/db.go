@@ -23,6 +23,7 @@ type User struct {
 type FileInfo struct {
 	Username   string
 	Filename   string
+	Filesize   string
 	UpdateTime string
 }
 
@@ -68,8 +69,8 @@ func (d *Db) ModifyUser(user User) error {
 }
 
 func (d *Db) AddFile(fileInfo FileInfo) error {
-	err := d.conn.Exec("INSERT INTO `file` (`id`,`username`,`filename`,`update_time`) VALUES(0,?,?,?)",
-		fileInfo.Username, fileInfo.Filename, fileInfo.UpdateTime).Error
+	err := d.conn.Exec("INSERT INTO `file` (`id`,`username`,`filename`,`filesize`,`update_time`) VALUES(0,?,?,?,?)",
+		fileInfo.Username, fileInfo.Filename,fileInfo.Filesize, fileInfo.UpdateTime).Error
 	return err
 }
 
