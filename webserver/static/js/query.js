@@ -27,10 +27,12 @@ function regInfo() {
     var username = $('#uname').val()
     var pwd = $('#pwd').val()
     var pwdr = $('#pwdr').val()
+    var email = $('#uemail').val()
 
     console.log("username:", username)
     console.log("pwd:", pwd)
     console.log("pwdr:", pwdr)
+    console.log("emial:",email)
 
     if (pwd != pwdr) {
         alert("密码与确认密码不一致")
@@ -41,6 +43,7 @@ function regInfo() {
     var cmd = {
         'username': username,
         'password': pwd,
+        'email':email,
     }
     let res = util.httpPost(reqUrl, JSON.stringify(cmd))
     console.log(res)
@@ -49,6 +52,38 @@ function regInfo() {
         return true
     }
     alert("请求错误，用户名已注册")
+    return false
+}
+
+function modifyInfo() {
+    var username = $('#uname').val()
+    var pwd = $('#pwd').val()
+    var pwdr = $('#pwdr').val()
+    var email = $('#uemail').val()
+
+    console.log("username:", username)
+    console.log("pwd:", pwd)
+    console.log("pwdr:", pwdr)
+    console.log("emial:",email)
+
+    if (pwd != pwdr) {
+        alert("密码与确认密码不一致")
+        return false
+    }
+
+    var reqUrl = httpAddr + "modify"
+    var cmd = {
+        'username': username,
+        'password': pwd,
+        'email':email,
+    }
+    let res = util.httpPost(reqUrl, JSON.stringify(cmd))
+    console.log(res)
+    if (res == true) {
+        alert("修改成功")
+        return true
+    }
+    alert("请求错误")
     return false
 }
 
@@ -67,7 +102,7 @@ function inputFile() {
         window.location.replace("http://121.5.245.69:6789/index")
 
     } else {
-        alert("上传失败")
+        alert("上传失败,上传了重复的文件")
     }
 }
 
@@ -161,25 +196,4 @@ function adultFile() {
         alert("所选文件"+res.message+"未通过审计")
     }
     window.location.replace("http://121.5.245.69:6789/index")
-}
-
-function downLoadFile(){
-    var username = util.getItem("username")
-    if (username == null) {
-        window.location.href = LoginAddr
-        alert("请先登录")
-    }
-    var filename = []
-    for (var i = 0; i < arr.length; i++) {
-        if (checkBoxIdList[i + 1] == 1) {
-            filename.push(arr[i].name)
-        }
-    }
-    var reqUrl = httpAddr + "download_file"
-    for (var i=0;i<filename.length;i++){
-        let url = reqUrl + "?username="+username + "&filename="+filename[i]
-        console.log("url is",url)
-        util.httpGet(url)
-    }
-    return true
 }

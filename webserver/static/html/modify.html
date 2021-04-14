@@ -5,10 +5,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
 
-    <title>注册</title>
+    <title>修改信息</title>
 </head>
 
 <body>
@@ -19,7 +20,7 @@
 <div class="container">
     <div class="jumbotron">
         <h1 class="display-4">区块连云存储和审计系统</h1>
-        <p>注册页面</p>
+        <p>修改信息页面</p>
         <hr class="my-4">
         <p>主要使用hyperledger fabric1.1区块连框架，如果想知道更多关于fabric的知识，点击下方知道更多按钮</p>
         <a class="btn btn-primary btn-lg"
@@ -27,8 +28,8 @@
            role="button">知道更多</a>
     </div>
 </div>
-
 <div class="container">
+
     <form action="./login">
         <label>用户名:</label>
         <input type="text" class="form-control" id="uname" /><br>
@@ -38,7 +39,7 @@
         <input type="password" class="form-control" id="pwd" /><br>
         <label>确认密码</label>
         <input type="password" class="form-control" id="pwdr" /><br>
-        <input type="submit" class="btn btn-primary" value="注册" onclick="return regInfo()" />
+        <input type="submit" class="btn btn-primary" value="修改" onclick="return modifyInfo()" />
         <input type="submit"  class="btn btn-primary" value="取消" onclick="return true" />
     </form>
 </div>
