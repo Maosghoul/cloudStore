@@ -22,17 +22,13 @@
         <h1 class="display-4">区块连云存储和审计系统</h1>
         <p>修改信息页面</p>
         <hr class="my-4">
-        <p>主要使用hyperledger fabric1.1区块连框架，如果想知道更多关于fabric的知识，点击下方知道更多按钮</p>
-        <a class="btn btn-primary btn-lg"
-           href="https://hyperledger-fabric.readthedocs.io/en/release-1.1/getting_started.html#"
-           role="button">知道更多</a>
     </div>
 </div>
 <div class="container">
 
     <form action="./login">
         <label>用户名:</label>
-        <input type="text" class="form-control" id="uname" /><br>
+        <input type="text" class="form-control " id="uname" value="xx" readonly><br>
         <label>邮 箱:</label>
         <input type="email" class="form-control" id="uemail" /><br>
         <label>密 码:</label>
@@ -44,10 +40,16 @@
     </form>
 </div>
 
-<script src="//code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.3.min.js"><script/>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
 <script src="/static/js/query.js"></script>
 <script src="/static/js/util.js"></script>
+<script>
+    var uuu = util.getItem("username")
+    console.log("username",uuu)
+    console.log("val:",$('#uname').val())
+    $('#uname').val(uuu)
+</script>
 
 
 </body>
