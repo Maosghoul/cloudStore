@@ -1,5 +1,5 @@
 # cloudStore
-毕业设计 : 一个简单的云存储系统和文件审计系统，基于golang开发<br>
+ 一个简单的云存储系统和文件审计系统，基于golang开发<br>
 参考文献:<br>
 hyperledger fabric v1.1: https://hyperledger-fabric.readthedocs.io/en/release-1.1/getting_started.html# <br>
 native 方式部署fabric 网络： https://blog.csdn.net/u013938484/article/details/79867992  <br>
