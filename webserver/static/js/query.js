@@ -1,5 +1,6 @@
 var httpAddr = "http://121.5.245.69:6789/cs/";
 var LoginAddr = "http://121.5.245.69:6789/login";
+var IndexAddr = "http://121.5.245.69:6789/index"
 
 var arr = [];
 var checkBoxIdList = new Array();
@@ -147,26 +148,33 @@ function deleteFile() {
         window.location.href = LoginAddr
         alert("请先登录")
     }
+
+
     var filename = []
     for (var i = 0; i < arr.length; i++) {
         if (checkBoxIdList[i + 1] == 1) {
             filename.push(arr[i].name)
         }
     }
-    var reqUrl = httpAddr + "delete_file"
-    var cmd = {
-        'username': username,
-        'filename': filename
-    }
-    let res = util.httpPost(reqUrl, JSON.stringify(cmd))
-    console.log("delete file:", res)
-    if (res == true) {
-        alert("删除成功")
+    if(filename.length==0){
+        alert("请选择文件!")
         window.location.replace("http://121.5.245.69:6789/index")
-        return true
+    }else {
+        var reqUrl = httpAddr + "delete_file"
+        var cmd = {
+            'username': username,
+            'filename': filename
+        }
+        let res = util.httpPost(reqUrl, JSON.stringify(cmd))
+        console.log("delete file:", res)
+        if (res == true) {
+            alert("删除成功")
+            window.location.replace("http://121.5.245.69:6789/index")
+            return true
+        }
+        alert("删除失败")
+        return false
     }
-    alert("删除失败")
-    return false
 }
 
 function adultFile() {
@@ -181,19 +189,24 @@ function adultFile() {
             filename.push(arr[i].name)
         }
     }
-    var reqUrl = httpAddr + "adult_file"
-    var cmd = {
-        'username': username,
-        'filename': filename
+    if(filename.length==0){
+        alert("请选择文件!")
+        window.location.replace("http://121.5.245.69:6789/index")
+    }else {
+        var reqUrl = httpAddr + "adult_file"
+        var cmd = {
+            'username': username,
+            'filename': filename
+        }
+        let res = util.httpPostWithResp(reqUrl, JSON.stringify(cmd))
+        console.log("delete file:", res)
+        console.log("res code :", res.code)
+        console.log("res message :", res.message)
+        if (res.code == "0") {
+            alert("所选文件通过审计")
+        } else {
+            alert("所选文件" + res.message + "未通过审计")
+        }
+        window.location.replace("http://121.5.245.69:6789/index")
     }
-    let res = util.httpPostWithResp(reqUrl, JSON.stringify(cmd))
-    console.log("delete file:", res)
-    console.log("res code :",res.code)
-    console.log("res message :",res.message)
-    if (res.code =="0"){
-        alert("所选文件通过审计")
-    }else{
-        alert("所选文件"+res.message+"未通过审计")
-    }
-    window.location.replace("http://121.5.245.69:6789/index")
 }
